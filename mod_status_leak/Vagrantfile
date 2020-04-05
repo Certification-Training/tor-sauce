@@ -1,0 +1,33 @@
+# Make sure to install vagrant-vbguest plugin.
+#
+# vagrant plugin install vagrant-vbguest
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/eoan64"
+  
+  config.vm.define "tor" do |instance|
+    instance.vm.provider "virtualbox" do |vm|
+      vm.name = "ubuntu-tor"
+    end
+
+    instance.vm.hostname = "ubuntu-tor"
+  end
+
+  config.vm.provision "file" do |file|
+    file.source = "torrc"
+    file.destination = "torrc"
+  end
+
+  config.vm.provision "file" do |file|
+    file.source = "hidden_service.conf"
+    file.destination = "hidden_service.conf"
+  end
+
+  config.vm.provision "file" do |file|
+    file.source = "clearnet_service.conf"
+    file.destination = "clearnet_service.conf"
+  end
+  
+  config.vm.boot_timeout = 900
+  config.vm.provision "shell", path: "config-machine.sh"
+end
