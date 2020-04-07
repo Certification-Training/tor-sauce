@@ -39,7 +39,7 @@ sudo mkdir --parent /var/www/hidden_service/
 sudo mkdir --parent /var/www/clearnet_service/
 
 sudo echo 'Welcome to the dark web' >> /var/www/hidden_service/index.html
-sudo echo 'Welcom to the clearnet' >> /var/www/clearnet_service/index.html
+sudo echo 'Welcome to the clearnet' >> /var/www/clearnet_service/index.html
 
 sudo chown --recursive www-data:www-data /var/www/
 sudo chmod --recursive 755 /var/www
