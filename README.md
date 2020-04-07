@@ -87,8 +87,8 @@ vagrant@ubuntu-tor:~$ curl --silent \
 
 As you can see, the clearnet service is exposed. An attacker could resolve the
 IP address of the domain name and fetch the real identity of the hidden
-service. For this example I used a fake domain name. You could technically set
-up a honeypot on purpose to catch hackers.
+service. For this example I used a fake domain name, **mr-robot.bounceme.net**.
+You could technically set up a honeypot on purpose to catch hackers.
 
 ![Apache Vulnerability](img/tor.png)
 
