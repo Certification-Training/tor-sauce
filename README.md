@@ -85,12 +85,12 @@ vagrant@ubuntu-tor:~$ curl --silent \
   lynx --stdin
 ```
 
-![Apache Vulnerability](img/tor.png)
-
 As you can see, the clearnet service is exposed. An attacker could resolve the
 IP address of the domain name and fetch the real identity of the hidden
 service. For this example I used a fake domain name. You could technically set
 up a honeypot on purpose to catch hackers.
+
+![Apache Vulnerability](img/tor.png)
 
 ### Fix the Vulnerability
 
