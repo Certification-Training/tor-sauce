@@ -7,6 +7,10 @@ A repository used for studying security related topics that deal with Tor (anony
 # Usage
 
 * [Apache mod_status Leak](#apache-mod_status-leak)
+  * [Deploy Ubuntu VM with Tor Installed](#deploy-ubuntu-vm-with-tor-installed)
+  * [Demo the Vulnerability](#demo-the-vulnerability)
+  * [Fix the Vulnerability](#fix-the-vulnerability)
+  * [Cleanup Vagrant](#cleanup-vagrant)
 
 
 ## Apache mod_status Leak
@@ -87,7 +91,7 @@ As you can see, the clearnet service is exposed. An attacker could resolve the
 IP address of the domain name and fetch the real identity of the hidden
 service.
 
-### Fix the mod_status Vulnerability
+### Fix the Vulnerability
 
 In default Apache configuration, the server sends HTTP Header with the
 information of Apache version, modules, Operating System, etc of the Server.
