@@ -15,6 +15,7 @@ A repository used for studying security related topics that deal with Tor (anony
   * [Demo the Vulnerability (Vagrant)](#demo-the-vulnerability-vagrant)
   * [Patch the Vulnerability (Vagrant)](#patch-the-vulnerability-vagrant)
   * [Teardown Vagrant](#cleanup-vagrant)
+* [Configuring an Authenticated Onion Service](#configuring-an-authenticated-onion-service)
 
 
 ## Apache mod_status Leak
@@ -385,6 +386,75 @@ freeup roughly 486MB of space.
 $ vagrant box list
 $ vagrant box remove ubuntu/eoan64
 ```
+
+## Configuring an Authenticated Onion Service
+
+An authenticated Onion service is a certain kind of Tor hidden service that
+requires clients to supply an authentication token (basically, a password)
+before responding to incoming connection requests. There are two different,
+compatible Onion service versions that support client authentication:
+version 2, and version 3. I will cover version 3 due to being the latest
+version being used.
+
+Generate Tor version 3 Onion service keys.
+
+```
+$ openssl genpkey -algorithm x25519 -out /tmp/private-key.pem
+
+$ encoded_priv_key=$(
+    cat /tmp/private-key.pem | \
+      grep --invert-match " PRIVATE KEY" | \
+      base64pem --decode | \
+      tail --bytes=32 | \
+      base32 | \
+      sed 's/=//g'
+  )
+
+$ encoded_pub_key=$(
+    openssl pkey -in /tmp/private-key.pem -pubout | \
+      grep --invert-match " PUBLIC KEY" | \
+      base64pem --decode | \
+      tail --bytes=32 | \
+      base32 | \
+      sed 's/=//g'
+  )
+
+$ echo "descriptor:x25519:$encoded_pub_key" | sudo tee --append \
+    /var/lib/tor/hidden_service/authorized_clients/mr-robot.auth
+
+$ systemctl restart tor
+```
+
+Attempt to connect to the Onion service using Tor browser or curl. You should
+receive an error message that the browser was unable to connect to the server.
+
+![Tor Browser](img/tor-auth.png)
+
+Close the Tor browser and configure the Tor browser to use a private key to
+authenticate with the specified onion service.
+
+Add ClientOnionAuthDir to the **torrc** configuration file. Makre sure to
+specify the path where you installed the Tor browser. In Windows I have
+installed it under C:\Tor Browser. The torrc configuration file is located
+under C:\Tor Browser\Browser\TorBrowser\Data\Tor directory.
+
+```
+ClientOnionAuthDir C:\Tor Browser\Browser\TorBrowser\Data\Tor\authorized_clients
+```
+
+Add the private key that was generated earlier to **random_name.auth_private**
+file under the authorized_clients folder on the client side. Replace
+random_name with a name of your choosing.
+
+```
+$ onion_address=$(sudo cat /var/lib/tor/hidden_service/hostname)
+$ echo "${onion_address%.onion}:descriptor:x25519:$encoded_priv_key"
+
+2lttkgvduopg2uahgkl5m5il3ncvcmqhsfjbzflz7dsaspph4r2nx3yd:descriptor:x25519:SAAPQSQZEEIYN7BN6A3H3TUMKHKIUQLM2OF4XLB3KVIMBHC72NIA
+```
+
+Restart the Tor browser and attempt to connect to the Onion service. This time
+you should be able to see the service responding back.
 
 # Acknowledgments
 
