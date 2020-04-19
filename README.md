@@ -433,17 +433,18 @@ receive an error message that the browser was unable to connect to the server.
 Close the Tor browser and configure the Tor browser to use a private key to
 authenticate with the specified onion service.
 
-Add ClientOnionAuthDir to the **torrc** configuration file. Makre sure to
+Add **ClientOnionAuthDir** to the **torrc** configuration file. Makre sure to
 specify the path where you installed the Tor browser. In Windows I have
-installed it under C:\Tor Browser. The torrc configuration file is located
-under C:\Tor Browser\Browser\TorBrowser\Data\Tor directory.
+installed it under C:\Tor Browser.
+
+The torrc configuration file is located under C:\Tor Browser\Browser\TorBrowser\Data\Tor directory.
 
 ```
 ClientOnionAuthDir C:\Tor Browser\Browser\TorBrowser\Data\Tor\authorized_clients
 ```
 
 Add the private key that was generated earlier to **random_name.auth_private**
-file under the authorized_clients folder on the client side. Replace
+file under the **authorized_clients** folder on the client side. Replace
 random_name with a name of your choosing.
 
 ```
