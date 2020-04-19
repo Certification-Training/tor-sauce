@@ -15,17 +15,17 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "file" do |file|
     file.source = "torrc"
-    file.destination = "torrc"
+    file.destination = "/tmp/torrc"
   end
 
   config.vm.provision "file" do |file|
     file.source = "hidden_service.conf"
-    file.destination = "hidden_service.conf"
+    file.destination = "/tmp/hidden_service.conf"
   end
 
   config.vm.provision "file" do |file|
     file.source = "clearnet_service.conf"
-    file.destination = "clearnet_service.conf"
+    file.destination = "/tmp/clearnet_service.conf"
   end
   
   config.vm.boot_timeout = 900

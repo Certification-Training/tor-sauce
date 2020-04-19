@@ -7,10 +7,14 @@ A repository used for studying security related topics that deal with Tor (anony
 # Usage
 
 * [Apache mod_status Leak](#apache-mod_status-leak)
-  * [Deploy Ubuntu VM with Tor Installed](#deploy-ubuntu-vm-with-tor-installed)
-  * [Demo the Vulnerability](#demo-the-vulnerability)
-  * [Fix the Vulnerability](#fix-the-vulnerability)
-  * [Cleanup Vagrant](#cleanup-vagrant)
+  * [Deploy EC2 Ubuntu Instance](#deploy-ec2-ubuntu-instance)
+  * [Demo the Vulnerability (AWS)](#demo-the-vulnerability-aws)
+  * [Patch the Vulnerability (AWS)](#patch-the-vulnerability-aws)
+  * [Teardown Terraform AWS Instance](#teardown-terraform-aws-instance)
+  * [Deploy Vagrant Ubuntu VM](#deploy-vagrant-ubuntu-vm)
+  * [Demo the Vulnerability (Vagrant)](#demo-the-vulnerability-vagrant)
+  * [Patch the Vulnerability (Vagrant)](#patch-the-vulnerability-vagrant)
+  * [Teardown Vagrant](#cleanup-vagrant)
 
 
 ## Apache mod_status Leak
@@ -21,7 +25,221 @@ the **/server-status** path on the Web server. Simply by visiting
 http://host.onion/server-status may reveal the server's clearnet IP address,
 along with other information.
 
-### Deploy Ubuntu VM with Tor Installed
+### Deploy EC2 Ubuntu Instance
+
+The Vagrant deployment has some pitfalls when demonstrating the vulnerability.
+You would have to expose your router, in order to trully expose the clearnet
+site. To circumvent this issue, I have included terraform configuration files
+to deploy an **EC2 instance** running Ubuntu.
+
+Initialize the modules, backend, and provider plugins.
+
+```
+$ cd mod_status_leak/terraform
+$ terraform init
+
+Initializing the backend...
+
+Initializing provider plugins...
+- Checking for available provider plugins...
+- Downloading plugin for provider "aws" (hashicorp/aws) 2.58.0...
+```
+
+Generate SSH key, by default Terraform will look for the private key in the
+Terraform working directory. You can add your own existing private key by
+modifying the default value of private_key in 
+**mod_status_leak/terraform/vars.tf** file.
+
+```
+$ ssh-keygen -f id_rsa
+
+Generating public/private rsa key pair.
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in id_rsa.
+Your public key has been saved in id_rsa.pub.
+The key fingerprint is:
+SHA256:oOo0ZOgO0nRELpuPSyi/f5nPvKQWqHji/7bt6nUHp48 massimo@laptop-asus
+The key's randomart image is:
++---[RSA 2048]----+
+|    .            |
+|   o             |
+|  . o .          |
+| . = . .         |
+|. * o.  S. .     |
+|.* =. .   +      |
+|=oB..  =.o .     |
+|B=oo .B=. +      |
+|.=*+=B=+=E .     |
++----[SHA256]-----+
+```
+
+Make sure you specify the public key as an input variable in the
+**terraform.tfvars** file.
+
+```
+$ cat terraform.tfvars
+
+public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDdw0A1JBVxDByuHnHbn8+p5iVLSXxzH3pRiY8lenNe9uesExjQdxyL/C4r8QAxpijC+MzRAHgQMdEGfKZM6i5XAQ9kILh6KTrYZ8D8ZbayoYYirTc2Flvpd/gDIy2AYElwBuwCs5dNKUUqdU4gLwb7cc2YHdyhtXDst6k3IkOctRDpkVtQ5uSsb+lR5Y/BR3k6hP+Pn6kttf3rJe9QmZSOnRvcs470KNZK+VSalwXnCKmNg1hz4k/wArXVhcqtJBkBl0zeD1JIIdH8ZxOs1ZffznvVKDoAdZ9pEYxg+OYvrU5j/akaUogBJBmL+npFMwOq3HaR0ypfxRugAn3J8q/j massimo@mr-robot"
+```
+
+Deploy EC2 Ubuntu instance.
+
+```
+$ terraform apply
+
+Plan: 5 to add, 0 to change, 0 to destroy.
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+Apply complete! Resources: 5 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+public_ip = 18.144.161.55
+```
+
+Once the deployment is done, you will receive an IP address. Connect to the
+provisioned EC2 instance by using SSH. Make sure you accept the unknown host
+fingerprint. This is normal when connecting for the first time.
+
+```
+$ ssh -i id_rsa ubuntu@18.144.161.55
+
+The authenticity of host '18.144.161.55 (18.144.161.55)' can't be established.
+ECDSA key fingerprint is SHA256:xpzaU0Odg0dUq22IOjaxylk7rT/atrQ+IhpuN1m+NxE.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '18.144.161.55' (ECDSA) to the list of known hosts.
+```
+
+### Demo the Vulnerability (AWS)
+
+The virtual machine contains a hosted hidden service using the Tor anonymity
+network. Also to demonstrate the vulnerability, a normal service is hosted on
+port 80. The mod_status leak will show you what services are being hosted on
+the server. By exposing the regular service, you will be able to fetch the real
+IP address of the server.
+
+Test that the clearnet service is up and running from outside the EC2 instance.
+You should receive a response from Apache.
+
+```
+$ curl 18.144.161.55
+Welcome to the clearnet
+```
+Fetch the onion address that was generated from Tor.
+
+```
+ubuntu@ip-172-31-6-113:~$ sudo cat /var/lib/tor/hidden_service/hostname
+5sxyhgvo7lszagxupklek2ggeuw2creydxmyt4jdk35ksfwyy7olyjad.onion
+```
+
+Download the Tor Browser and visit the server-status page hosted on the hidden
+service.
+
+```
+5sxyhgvo7lszagxupklek2ggeuw2creydxmyt4jdk35ksfwyy7olyjad.onion/server-status
+```
+
+As you can see, the clearnet service is exposed. The VHost for the clearnet
+shows the actual IP address of the server. This is not always the case, you
+will most likely encounter a domain name. An attacker could resolve the
+IP address of the domain name and fetch the real identity of the hidden
+service. Also you can use a fake domain name, **mr-robot.bounceme.net**.
+You could technically set up a honeypot on purpose to catch hackers.
+
+![Apache Vulnerability](img/pwn-aws.png)
+
+### Patch the Vulnerability (AWS)
+
+In default Apache configuration, the server sends HTTP Header with the
+information of Apache version, modules, Operating System, etc of the Server.
+The HTTP response header **Server** displays all these details of the server.
+This information can be used by hackers to try to exploit any vulnerabilities
+in the Apache, OS or other modules you are running, specially if you are
+running an older version with known vulnerabilities.
+
+There is an easy way to hide the apache version and other server information
+from the HTTP headers. By setting the **ServerTokens** and **ServerSignature**
+variables in your httpd.conf file the server information would not longer be
+added to the HTTP headers.
+
+```
+ubuntu@ip-172-31-6-113:~$ sudo sed \
+  --in-place 's/ServerTokens OS/ServerTokens Prod/' \
+  /etc/apache2/conf-enabled/security.conf
+
+ubuntu@ip-172-31-6-113:~$ sudo sed \
+  --in-place 's/ServerSignature On/ServerSignature Off/' \
+  /etc/apache2/conf-enabled/security.conf
+```
+
+Disable Apache's mod_status module to turn off status information.
+
+```
+ubuntu@ip-172-31-6-113:~$ sudo a2dismod status
+ubuntu@ip-172-31-6-113:~$ sudo service apache2 restart
+```
+
+Using curl, attempt to hit the server-status page.
+
+```
+ubuntu@ip-172-31-6-113:~$ curl --silent \
+  --socks5-hostname localhost:9050 \
+  5sxyhgvo7lszagxupklek2ggeuw2creydxmyt4jdk35ksfwyy7olyjad.onion/server-status
+
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL was not found on this server.</p>
+</body></html>
+```
+
+As you can see, the vulnerability has been patched. A lesson learned from this
+is that you should never trust the default configuration. By default the status
+module is enable for sysadmins to monitor Apache. This configuration setting is
+not secure.
+
+### Teardown Terraform AWS Instance
+
+After you are done with the Ubuntu EC2 instance, make sure to teardown the
+instance using Terraform.
+
+```
+$ terraform destroy
+
+Plan: 0 to add, 0 to change, 5 to destroy.
+
+Do you really want to destroy all resources?
+  Terraform will destroy all your managed infrastructure, as shown above.
+  There is no undo. Only 'yes' will be accepted to confirm.
+
+  Enter a value: yes
+
+aws_instance.ec2_server: Destroying... [id=i-0be790084b895b127]
+aws_instance.ec2_server: Still destroying... [id=i-0be790084b895b127, 10s elapsed]
+aws_instance.ec2_server: Still destroying... [id=i-0be790084b895b127, 20s elapsed]
+aws_instance.ec2_server: Still destroying... [id=i-0be790084b895b127, 30s elapsed]
+aws_instance.ec2_server: Destruction complete after 31s
+aws_security_group.egress_sg: Destroying... [id=sg-055bf00aea29e1294]
+aws_security_group.ssh_sg: Destroying... [id=sg-09c13c33441469b85]
+aws_key_pair.ssh_key: Destroying... [id=tor_sauce]
+aws_security_group.http_sg: Destroying... [id=sg-0c21df247c70028df]
+aws_key_pair.ssh_key: Destruction complete after 0s
+aws_security_group.ssh_sg: Destruction complete after 0s
+aws_security_group.http_sg: Destruction complete after 0s
+aws_security_group.egress_sg: Destruction complete after 0s
+
+Destroy complete! Resources: 5 destroyed.
+```
+
+### Deploy Vagrant Ubuntu VM
 
 In order to demonstrate the vulnerability, I have created a Vagrantfile to
 provision a virtual machine with the vulnerability installed.
@@ -51,7 +269,7 @@ Connect to the provisioned virtual machine by using SSH.
 $ vagrant ssh
 ```
 
-### Demo the Vulnerability
+### Demo the Vulnerability (Vagrant)
 
 The virtual machine contains a hosted hidden service using the Tor anonymity
 network. Also to demonstrate the vulnerability, a normal service is hosted on
@@ -92,7 +310,7 @@ You could technically set up a honeypot on purpose to catch hackers.
 
 ![Apache Vulnerability](img/tor.png)
 
-### Fix the Vulnerability
+### Patch the Vulnerability (Vagrant)
 
 In default Apache configuration, the server sends HTTP Header with the
 information of Apache version, modules, Operating System, etc of the Server.
@@ -144,7 +362,7 @@ is that you should never trust the default configuration. By default the status
 module is enable for sysadmins to monitor Apache. This configuration setting is
 not secure.
 
-### Cleanup Vagrant
+### Teardown Vagrant
 
 After you are done with the virtual machine, make sure to cleanup the
 environment.
