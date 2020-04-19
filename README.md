@@ -435,9 +435,10 @@ authenticate with the specified onion service.
 
 Add **ClientOnionAuthDir** to the **torrc** configuration file. Makre sure to
 specify the path where you installed the Tor browser. In Windows I have
-installed it under C:\Tor Browser.
+installed it under **C:\Tor Browser**.
 
-The torrc configuration file is located under C:\Tor Browser\Browser\TorBrowser\Data\Tor directory.
+The torrc configuration file is located under
+**C:\Tor Browser\Browser\TorBrowser\Data\Tor** directory.
 
 ```
 ClientOnionAuthDir C:\Tor Browser\Browser\TorBrowser\Data\Tor\authorized_clients
