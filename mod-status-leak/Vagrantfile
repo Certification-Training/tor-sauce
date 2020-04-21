@@ -19,13 +19,13 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provision "file" do |file|
-    file.source = "hidden_service.conf"
-    file.destination = "/tmp/hidden_service.conf"
+    file.source = "hidden-service.conf"
+    file.destination = "/tmp/hidden-service.conf"
   end
 
   config.vm.provision "file" do |file|
-    file.source = "clearnet_service.conf"
-    file.destination = "/tmp/clearnet_service.conf"
+    file.source = "clearnet-service.conf"
+    file.destination = "/tmp/clearnet-service.conf"
   end
   
   config.vm.boot_timeout = 900

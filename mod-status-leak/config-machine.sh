@@ -60,25 +60,25 @@ echo "ServerName $onion_address" | \
   sudo tee --append /etc/apache2/apache2.conf
 
 sudo mv --force \
-  /tmp/hidden_service.conf \
+  /tmp/hidden-service.conf \
   /etc/apache2/sites-available/
 
 sudo mv --force \
-  /tmp/clearnet_service.conf \
+  /tmp/clearnet-service.conf \
   /etc/apache2/sites-available/
 
 sudo sed \
   --in-place "s/ServerName/ServerName $onion_address/" \
-  /etc/apache2/sites-available/hidden_service.conf
+  /etc/apache2/sites-available/hidden-service.conf
 
 public_ip=$(dig +short myip.opendns.com @resolver1.opendns.com)
 
 sudo sed \
   --in-place "s/ServerName/ServerName $public_ip/" \
-  /etc/apache2/sites-available/clearnet_service.conf
+  /etc/apache2/sites-available/clearnet-service.conf
 
-sudo a2ensite hidden_service
-sudo a2ensite clearnet_service
+sudo a2ensite hidden-service
+sudo a2ensite clearnet-service
 
-sudo a2dissite 000-default.conf
+sudo a2dissite 000-default
 sudo service apache2 restart

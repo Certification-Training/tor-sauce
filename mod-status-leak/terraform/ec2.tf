@@ -19,13 +19,13 @@ resource "aws_instance" "ec2_server" {
   }
 
   provisioner "file" {
-    source      = "../hidden_service.conf"
-    destination = "/tmp/hidden_service.conf"
+    source      = "../hidden-service.conf"
+    destination = "/tmp/hidden-service.conf"
   }
 
   provisioner "file" {
-    source      = "../clearnet_service.conf"
-    destination = "/tmp/clearnet_service.conf"
+    source      = "../clearnet-service.conf"
+    destination = "/tmp/clearnet-service.conf"
   }
 
   provisioner "file" {
