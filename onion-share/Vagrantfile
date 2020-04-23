@@ -1,0 +1,23 @@
+# Make sure to install vagrant-vbguest plugin.
+#
+# vagrant plugin install vagrant-vbguest
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/eoan64"
+  
+  config.vm.define "onion-share" do |instance|
+    instance.vm.provider "virtualbox" do |vm|
+      vm.name = "onion-share"
+    end
+
+    instance.vm.hostname = "onion-share"
+  end
+  
+  config.vm.provision "file" do |file|
+    file.source = "death-star-owners-technical-manual-blueprints.jpg"
+    file.destination = "death-star-owners-technical-manual-blueprints.jpg"
+  end
+  
+  config.vm.boot_timeout = 900
+  config.vm.provision "shell", path: "config-machine.sh"
+end

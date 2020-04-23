@@ -16,7 +16,7 @@ A repository used for studying security related topics that deal with Tor (anony
   * [Patch the Vulnerability (Vagrant)](#patch-the-vulnerability-vagrant)
   * [Teardown Vagrant](#cleanup-vagrant)
 * [Configuring an Authenticated Onion Service](#configuring-an-authenticated-onion-service)
-
+* [OnionShare Secure File Sharing via Tor](#onionshare-secure-file-sharing-via-tor)
 
 ## Apache mod_status Leak
 
@@ -36,7 +36,7 @@ to deploy an **EC2 instance** running Ubuntu.
 Initialize the modules, backend, and provider plugins.
 
 ```
-$ cd mod_status_leak/terraform
+$ cd mod-status-leak/terraform
 $ terraform init
 
 Initializing the backend...
@@ -49,7 +49,7 @@ Initializing provider plugins...
 Generate SSH key, by default Terraform will look for the private key in the
 Terraform working directory. You can add your own existing private key by
 modifying the default value of private_key in 
-**mod_status_leak/terraform/vars.tf** file.
+**mod-status-leak/terraform/vars.tf** file.
 
 ```
 $ ssh-keygen -f id_rsa
@@ -259,7 +259,7 @@ $ vagrant plugin install vagrant-vbguest
 Provision the Ubuntu Tor virtual machine using Vagrant.
 
 ```
-$ cd mod_status_leak
+$ cd mod-status-leak
 $ vagrant up
 ```
 
@@ -457,6 +457,111 @@ $ echo "${onion_address%.onion}:descriptor:x25519:$encoded_priv_key"
 
 Restart the Tor browser and attempt to connect to the Onion service. This time
 you should be able to see the service responding back.
+
+## OnionShare Secure File Sharing via Tor
+
+Securely and anonymously share files of any size. A web server is started,
+making OnionShare accessible as a Tor Onion Service, potentially temporarily or
+in a stealthy manner, over the Internet. An unguessable address is generated
+and is shared for the recipient to open in the Tor Browser to download the
+files. No separate server or third party file-sharing service is required. You
+host the files on your own computer.
+
+Install the vagrant-vbguest plugin.
+
+```
+$ vagrant plugin install vagrant-vbguest
+```
+
+Provision the Ubuntu OnionShare virtual machine using Vagrant.
+
+```
+$ cd onion-share
+$ vagrant up
+```
+
+Wait for the machine to be provisioned, it might take up to ten minutes.
+Connect to the provisioned virtual machine by using SSH.
+
+```
+$ vagrant ssh
+```
+
+If you would like to copy files directly to the virtual machine, you can
+install an optional plugin.
+
+```
+$ vagrant plugin install vagrant-scp
+```
+
+The following step is optinal and can be skipped. As an example, to copy the
+secret Death Star plans to the VM issue the following command:
+
+Linux:
+
+```
+$ vagrant scp \ 
+    death-star-owners-technical-manual-blueprints.jpg \
+    onion-share:/home/vagrant
+```
+
+Windows (PowerShell):
+
+```
+PS> vagrant scp `
+      death-star-owners-technical-manual-blueprints.jpg `
+      onion-share:/home/vagrant
+```
+
+You are part of the Rebel Alliance (and a traitor)! In order to avoid certain
+defeat at the hands of The Empire, you must transmit the Death Star plans to a
+friend of yours, a fellow resistance fighter, whose contact information you
+already have. However, if you are observed communicating with your friend, you
+will both be arrested and charged with conspiracy to commit treason against The
+Emperor.
+
+Your mission is to arrange for the secret transfer of the Death Star plans from
+your computer to their computer, so that they may deliver the plans to Alliance Headquarters.
+
+![Death Start](img/death-star.gif)
+
+Start the OnionShare server to serve a file of your liking.
+
+```
+vagrant@onion-share:~$ onionshare death-star-owners-technical-manual-blueprints.jpg
+OnionShare 2.2.ppa1 | https://onionshare.org/
+Connecting to the Tor network: 100% - Done
+Setting up onion service on port 17631.
+Compressing files.
+ * Running on http://127.0.0.1:17631/ (Press CTRL+C to quit)
+
+Give this address to the recipient:
+http://onionshare:visa-spool@pn3oumb7yted4mfdeopaushu3ah7f3n76nlo3pgpb4hceunu4dq6xoad.onion
+
+Press Ctrl+C to stop the server
+127.0.0.1 - - [21/Apr/2020 04:00:02] "GET / HTTP/1.1" 401 -
+127.0.0.1 - - [21/Apr/2020 04:00:08] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [21/Apr/2020 04:00:09] "GET /static_l54jkdb3gozzgftv7ifvw2mnwe/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [21/Apr/2020 04:00:10] "GET /static_l54jkdb3gozzgftv7ifvw2mnwe/js/send.js HTTP/1.1" 200 -
+127.0.0.1 - - [21/Apr/2020 04:00:10] "GET /static_l54jkdb3gozzgftv7ifvw2mnwe/img/logo.png HTTP/1.1" 200 -
+127.0.0.1 - - [21/Apr/2020 04:00:10] "GET /static_l54jkdb3gozzgftv7ifvw2mnwe/img/web_file.png HTTP/1.1" 200 -
+127.0.0.1 - - [21/Apr/2020 04:00:11] "GET /static_l54jkdb3gozzgftv7ifvw2mnwe/img/favicon.ico HTTP/1.1" 200 -
+127.0.0.1 - - [21/Apr/2020 04:01:02] "GET /download HTTP/1.1" 200 -
+1.4 MiB, 100.00%
+Stopped because transfer is complete
+```
+
+Share the link with a friend and tell them to use the Tor Browser to browse the
+shared file.
+
+![OnionShare](img/onion-share.png)
+
+Immediately after the receiver finishes downloading the sensitive file, the
+sender's Onion site automatically shuts down. This means no one can connect to
+it any longer, effectively ensuring that one and only one receiver can download
+the shared file(s). In our example scenario, this is exactly the behavior we
+want because it is critical to ensure that only the intended recipient is the
+one who received the sensitive file.
 
 # Acknowledgments
 
