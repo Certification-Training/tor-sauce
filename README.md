@@ -139,7 +139,7 @@ ubuntu@ip-172-31-6-113:~$ sudo cat /var/lib/tor/hidden_service/hostname
 5sxyhgvo7lszagxupklek2ggeuw2creydxmyt4jdk35ksfwyy7olyjad.onion
 ```
 
-Download the Tor Browser and visit the server-status page hosted on the hidden
+Download Tor Browser and visit the server-status page hosted on the hidden
 service.
 
 ```
@@ -430,11 +430,11 @@ receive an error message that the browser was unable to connect to the server.
 
 ![Tor Browser](img/tor-auth.png)
 
-Close the Tor browser and configure the Tor browser to use a private key to
+Close Tor Browser and configure Tor Browser to use a private key to
 authenticate with the specified onion service.
 
 Add **ClientOnionAuthDir** to the **torrc** configuration file. Makre sure to
-specify the path where you installed the Tor browser. In Windows I have
+specify the path where you installed Tor Browser. In Windows I have
 installed it under **C:\Tor Browser**.
 
 The torrc configuration file is located under
@@ -455,7 +455,7 @@ $ echo "${onion_address%.onion}:descriptor:x25519:$encoded_priv_key"
 2lttkgvduopg2uahgkl5m5il3ncvcmqhsfjbzflz7dsaspph4r2nx3yd:descriptor:x25519:SAAPQSQZEEIYN7BN6A3H3TUMKHKIUQLM2OF4XLB3KVIMBHC72NIA
 ```
 
-Restart the Tor browser and attempt to connect to the Onion service. This time
+Restart Tor Browser and attempt to connect to the Onion service. This time
 you should be able to see the service responding back.
 
 ## OnionShare Secure File Sharing via Tor
@@ -463,7 +463,7 @@ you should be able to see the service responding back.
 Securely and anonymously share files of any size. A web server is started,
 making **OnionShare** accessible as a **Tor Onion Service**, potentially
 temporarily or in a stealthy manner, over the Internet. An unguessable address
-is generated and is shared for the recipient to open in the Tor Browser to
+is generated and is shared for the recipient to open in Tor Browser to
 download the files. No separate server or third party file-sharing service is
 required. You host the files on your own computer.
 
@@ -553,7 +553,7 @@ Press Ctrl+C to stop the server
 Stopped because transfer is complete
 ```
 
-Share the link with a friend and tell them to use the Tor Browser to browse the
+Share the link with a friend and tell them to use Tor Browser to browse the
 shared file.
 
 ![OnionShare](img/onion-share.png)
@@ -605,7 +605,7 @@ Received: /home/vagrant/OnionShare/2020-04-24/02.51.38/John-wick-chapter-2.jpg
 ^C127.0.0.1 - - [24/Apr/2020 02:52:13] "GET /ipekf54ojipog37pxs2plmm5sy/shutdown HTTP/1.1" 200 -
 ```
 
-Share the link with a friend and tell them to use the Tor Browser to upload a
+Share the link with a friend and tell them to use Tor Browser to upload a
 shared file.
 
 ![OnionShare](img/onion-upload.png)
