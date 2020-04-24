@@ -309,7 +309,7 @@ IP address of the domain name and fetch the real identity of the hidden
 service. For this example I used a fake domain name, **mr-robot.bounceme.net**.
 You could technically set up a honeypot on purpose to catch hackers.
 
-![Apache Vulnerability](img/tor.png)
+![Apache Vulnerability](img/pwn-vagrant.png)
 
 ### Patch the Vulnerability (Vagrant)
 
@@ -461,11 +461,11 @@ you should be able to see the service responding back.
 ## OnionShare Secure File Sharing via Tor
 
 Securely and anonymously share files of any size. A web server is started,
-making OnionShare accessible as a Tor Onion Service, potentially temporarily or
-in a stealthy manner, over the Internet. An unguessable address is generated
-and is shared for the recipient to open in the Tor Browser to download the
-files. No separate server or third party file-sharing service is required. You
-host the files on your own computer.
+making **OnionShare** accessible as a **Tor Onion Service**, potentially
+temporarily or in a stealthy manner, over the Internet. An unguessable address
+is generated and is shared for the recipient to open in the Tor Browser to
+download the files. No separate server or third party file-sharing service is
+required. You host the files on your own computer.
 
 Install the vagrant-vbguest plugin.
 
@@ -520,8 +520,9 @@ already have. However, if you are observed communicating with your friend, you
 will both be arrested and charged with conspiracy to commit treason against The
 Emperor.
 
-Your mission is to arrange for the secret transfer of the Death Star plans from
-your computer to their computer, so that they may deliver the plans to Alliance Headquarters.
+Your mission is to arrange for the secret transfer of the **Death Star plans**
+from your computer to their computer, so that they may deliver the plans to
+Alliance Headquarters.
 
 ![Death Start](img/death-star.gif)
 
@@ -529,6 +530,7 @@ Start the OnionShare server to serve a file of your liking.
 
 ```
 vagrant@onion-share:~$ onionshare death-star-owners-technical-manual-blueprints.jpg
+
 OnionShare 2.2.ppa1 | https://onionshare.org/
 Connecting to the Tor network: 100% - Done
 Setting up onion service on port 17631.
@@ -562,6 +564,51 @@ it any longer, effectively ensuring that one and only one receiver can download
 the shared file(s). In our example scenario, this is exactly the behavior we
 want because it is critical to ensure that only the intended recipient is the
 one who received the sensitive file.
+
+In the above exercise, the **sender** role was responsible for creating the
+Onion site using OnionShare, while the **receiver** role was responsible for
+downloading the sensitive file from the Onion site using Tor Browser. To
+accomplish this, the sender used the default OnionShare mode, called
+**Share Files**. The OnionShare mode can be toggled to **Receive Mode**, which
+means that the person using OnionShare will become the receiver while the
+person using Tor Browser will become the sender.
+
+```
+vagrant@onion-share:~$ onionshare --receive
+
+OnionShare 2.2.ppa1 | https://onionshare.org/
+Connecting to the Tor network: 100% - Done
+Setting up onion service on port 17636.
+ * Running on http://127.0.0.1:17636/ (Press CTRL+C to quit)
+
+Files sent to you appear in this folder: /home/vagrant/OnionShare
+
+Warning: Receive mode lets people upload files to your computer. Some files can potentially take control of your computer if you open them. Only open things from people you trust, or if you know what you are doing.
+
+Give this address to the sender:
+http://onionshare:overturn-pajamas@dofzxzcouqkczjnub35xxgqbknvqsp2zf4tq2utx2xji5htyqk7da6yd.onion
+
+Press Ctrl+C to stop the server
+127.0.0.1 - - [24/Apr/2020 02:50:35] "GET / HTTP/1.1" 401 -
+127.0.0.1 - - [24/Apr/2020 02:50:39] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [24/Apr/2020 02:50:40] "GET /static_yetu75txv2sajcsz6lz6shxpae/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [24/Apr/2020 02:50:40] "GET /static_yetu75txv2sajcsz6lz6shxpae/js/jquery-3.4.0.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Apr/2020 02:50:41] "GET /static_yetu75txv2sajcsz6lz6shxpae/js/receive.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Apr/2020 02:50:41] "GET /static_yetu75txv2sajcsz6lz6shxpae/img/logo.png HTTP/1.1" 200 -
+127.0.0.1 - - [24/Apr/2020 02:50:41] "GET /static_yetu75txv2sajcsz6lz6shxpae/img/logo_large.png HTTP/1.1" 200 -
+127.0.0.1 - - [24/Apr/2020 02:50:42] "GET /static_yetu75txv2sajcsz6lz6shxpae/img/favicon.ico HTTP/1.1" 200 -
+Apr 24, 02:51AM: Upload of total size 129.4 KiB is starting
+=> 129.2 KiB       John-wick-chapter-2.jpg
+Received: /home/vagrant/OnionShare/2020-04-24/02.51.38/John-wick-chapter-2.jpg
+127.0.0.1 - - [24/Apr/2020 02:51:40] "POST /upload-ajax HTTP/1.1" 200 -
+127.0.0.1 - - [24/Apr/2020 02:51:41] "GET /static/img/ajax.gif HTTP/1.1" 404 -
+^C127.0.0.1 - - [24/Apr/2020 02:52:13] "GET /ipekf54ojipog37pxs2plmm5sy/shutdown HTTP/1.1" 200 -
+```
+
+Share the link with a friend and tell them to use the Tor Browser to upload a
+shared file.
+
+![OnionShare](img/onion-upload.png)
 
 # Acknowledgments
 
