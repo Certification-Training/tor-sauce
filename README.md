@@ -26,6 +26,8 @@ the **/server-status** path on the Web server. Simply by visiting
 http://host.onion/server-status may reveal the server's clearnet IP address,
 along with other information.
 
+[Back to top](#usage)
+
 ### Deploy EC2 Ubuntu Instance
 
 The Vagrant deployment has some pitfalls when demonstrating the vulnerability.
@@ -117,6 +119,8 @@ Are you sure you want to continue connecting (yes/no)? yes
 Warning: Permanently added '18.144.161.55' (ECDSA) to the list of known hosts.
 ```
 
+[Back to top](#usage)
+
 ### Demo the Vulnerability (AWS)
 
 The virtual machine contains a hosted hidden service using the Tor anonymity
@@ -154,6 +158,8 @@ service. Also you can use a fake domain name, **mr-robot.bounceme.net**.
 You could technically set up a honeypot on purpose to catch hackers.
 
 ![Apache Vulnerability](img/pwn-aws.png)
+
+[Back to top](#usage)
 
 ### Patch the Vulnerability (AWS)
 
@@ -207,6 +213,8 @@ is that you should never trust the default configuration. By default the status
 module is enable for sysadmins to monitor Apache. This configuration setting is
 not secure.
 
+[Back to top](#usage)
+
 ### Teardown Terraform AWS Instance
 
 After you are done with the Ubuntu EC2 instance, make sure to teardown the
@@ -240,6 +248,8 @@ aws_security_group.egress_sg: Destruction complete after 0s
 Destroy complete! Resources: 5 destroyed.
 ```
 
+[Back to top](#usage)
+
 ### Deploy Vagrant Ubuntu VM
 
 In order to demonstrate the vulnerability, I have created a Vagrantfile to
@@ -269,6 +279,8 @@ Connect to the provisioned virtual machine by using SSH.
 ```
 $ vagrant ssh
 ```
+
+[Back to top](#usage)
 
 ### Demo the Vulnerability (Vagrant)
 
@@ -310,6 +322,8 @@ service. For this example I used a fake domain name, **mr-robot.bounceme.net**.
 You could technically set up a honeypot on purpose to catch hackers.
 
 ![Apache Vulnerability](img/pwn-vagrant.png)
+
+[Back to top](#usage)
 
 ### Patch the Vulnerability (Vagrant)
 
@@ -363,6 +377,8 @@ is that you should never trust the default configuration. By default the status
 module is enable for sysadmins to monitor Apache. This configuration setting is
 not secure.
 
+[Back to top](#usage)
+
 ### Teardown Vagrant
 
 After you are done with the virtual machine, make sure to cleanup the
@@ -386,6 +402,8 @@ freeup roughly 486MB of space.
 $ vagrant box list
 $ vagrant box remove ubuntu/eoan64
 ```
+
+[Back to top](#usage)
 
 ## Configuring an Authenticated Onion Service
 
@@ -457,6 +475,8 @@ $ echo "${onion_address%.onion}:descriptor:x25519:$encoded_priv_key"
 
 Restart Tor Browser and attempt to connect to the Onion service. This time
 you should be able to see the service responding back.
+
+[Back to top](#usage)
 
 ## OnionShare Secure File Sharing via Tor
 
@@ -609,6 +629,8 @@ Share the link with a friend and tell them to use Tor Browser to upload a
 shared file.
 
 ![OnionShare](img/onion-upload.png)
+
+[Back to top](#usage)
 
 # Acknowledgments
 
